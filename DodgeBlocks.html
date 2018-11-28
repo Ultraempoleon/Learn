@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta = name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #000000;
+}
+</style>
+</head>
+
+<body onload="startGame()">
+<script>
+
+var myGamePiece;
+var myGamePiece2;
+var myGamePiece3;
+var myGamePiece4;
+var myGamePiece5;
+var myGamePiece6;
+var myGamePiece7;
+var myGamePiece8;
+var myGamePiece9;
+var myGamePiece0;
+var myGamePieceA;
+var myGamePieceB;
+var myGamePieceC;
+var mouse;
+var score;
+
+function startGame() {
+
+    mouse = new player(30, 30, "white", 480, 500);
+
+    myGamePiece = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece2 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece3 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece4 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece5 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece6 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+    myGamePiece7= new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+    myGamePiece8 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+    myGamePiece9 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+    myGamePiece0 = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+    myGamePieceA = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+    myGamePieceB = new component(25, 60, "red", Math.floor((Math.random() * 960) + 1), 
+	    Math.floor((Math.random() * 270) + 1));
+ 
+    
+    score = new scoreboard("30px", "Consolas", "white", 280, 40, "text");
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 960;
+        this.canvas.height = 540;
+        this.canvas.style.cursor = "none";
+        this.context = this.canvas.getContext("2d");
+	document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+	this.frameNo = 0;
+	this.Phase = 0;
+	this.interval = setInterval(updateGameArea, 10);
+	window.addEventListener('mousemove', function (e) {
+            myGameArea.x = e.pageX;
+	    myGameArea.y = e.pageY;
+	})
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+//Counts the intervals
+function intervalcounter(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) { return true;}
+        return false;
+}
+
+function player(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;
+    this.update = function() {
+        ctx = myGameArea.context;
+	ctx.fillStyle = color;
+	ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+	var myright = this.x + (this.width);
+	var mytop = this.y;
+	var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+	var otherright = otherobj.x + (otherobj.width);
+	var othertop = otherobj.y;
+	var otherbottom = otherobj.y + (otherobj.height);
+	var crash = true;
+	if ((mybottom < othertop) ||
+	    (mytop > otherbottom) ||
+            (myright < otherleft) ||
+	    (myleft > otherright)) {
+	        crash = false;
+	    }
+	return crash;
+    }
+}
+
+//these are the obstacles
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.gravity = 0.15;
+    this.gravitySpeed = 0;
+    this.update = function() {
+        ctx = myGameArea.context;
+	ctx.fillStyle = color;
+	ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.newPos = function() {
+        this.gravitySpeed += this.gravity;
+	this.x += this.speedX;
+	this.y += this.speedY + this.gravitySpeed;
+    } 
+}
+
+function scoreboard(width, height, color, x, y, type) {
+    this.type = type;
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y;
+    this.update = function() {
+        ctx = myGameArea.context;
+	if (this.type == "text") {
+          ctx.font = this.width + " " + this.height;
+          ctx.fillStyle = color;
+          ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    }
+}
+
+function updateGameArea() {
+    
+    if (mouse.crashWith(myGamePiece)) {
+        myGameArea.stop();	
+    } else {
+
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (intervalcounter(90)) {
+    
+    myGamePiece = new component(Math.floor((Math.random() * 110) + 45), 60, "red", Math.floor((Math.random() * 960) + 1), Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece2 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece3 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece4 = new component(Math.floor((Math.random() * 110) + 45), 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece5 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece6 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece7= new component(Math.floor((Math.random() * 110) + 45), 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece8 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece9 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePiece0 = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePieceA = new component(Math.floor((Math.random() * 110) + 45), 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePieceB = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1),
+            Math.floor((Math.random() * 270) + 1));
+    
+    myGamePieceC = new component(40, 60, "red", Math.floor((Math.random() * 960) + 1), 
+            Math.floor((Math.random() * 270) + 1));
+
+    myGameArea.Phase += 1;
+    }
+
+    score.text="PHASE: " + myGameArea.Phase;
+    score.update();
+    if (myGameArea.x && myGameArea.y) {
+        mouse.x = myGameArea.x;
+	mouse.y = myGameArea.y;
+    }
+    mouse.update();
+    
+    myGamePiece.newPos();
+    myGamePiece.update();
+    myGamePiece2.newPos();
+    myGamePiece2.update();
+    myGamePiece3.newPos();
+    myGamePiece3.update();
+    myGamePiece4.newPos();
+    myGamePiece4.update();
+    myGamePiece5.newPos();
+    myGamePiece5.update();
+    myGamePiece6.newPos();
+    myGamePiece6.update();
+    myGamePiece7.newPos();
+    myGamePiece7.update();
+    myGamePiece8.newPos();
+    myGamePiece8.update();
+    myGamePiece9.newPos();
+    myGamePiece9.update();
+    myGamePiece0.newPos();
+    myGamePiece0.update();
+    myGamePieceA.newPos();
+    myGamePieceA.update();
+    myGamePieceB.newPos();
+    myGamePieceB.update();
+    myGamePieceC.newPos();
+    myGamePieceC.update();
+    }
+}
+
+</script>
+<p> Use your mouse, and don't touch the red!</p>
+</body>
+</html>
